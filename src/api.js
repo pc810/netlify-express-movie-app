@@ -1,5 +1,5 @@
-const Movie = require('./modals/movie');
-const User = require('./modals/user');
+const Movie = require('./movie');
+const User = require('./user');
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose');
 const express = require('express');
@@ -10,19 +10,29 @@ const API_PORT = 8000;
 const app = express();
 
 const router = express.Router();
-
+/*
 // this is our MongoDB database
 const dbRoute =
-  'mongodb://localhost:27017/moviedb';
+  'mongodb+srv://smp1613:smp1613@moviereviewsentiment-8qo0k.gcp.mongodb.net/test';
 // connects our back end code with the database
 mongoose.connect(dbRoute, { useNewUrlParser: true });
+*/
+const uri = 
+    "mongodb+srv://smp1613:smp1613@moviereviewsentiment-8qo0k.gcp.mongodb.net/moviedb";
+const connectDB = async () =>{
+    await mongoose.connect(uri,{
+        useUnifiedTopology: true,
+        useNewUrlParser: true
+    })
+    console.log("connected")
+}
+connectDB();
+//let db = mongoose.connection;
 
-let db = mongoose.connection;
-
-db.once('open', () => console.log('connected to the database'));
+//db.once('open', () => console.log('connected to the database'));
 
 // checks if connection with the database is successful
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+//db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 // (optional) only made for logging and
 // bodyParser, parses the request body to be a readable json format
@@ -215,8 +225,15 @@ router.post('/PostReview', (req, res) => {
   }
   })
 });
-router.get('/test',(req,res)=>{
-    res.status(200).send({response:"hello"})
+router.get('/test',(req,res)=>{    
+    Movie.findOne({},{_id:1,poster:1,name:1,rated:1}, (err,movies)=>{
+        if(err)
+            res.send({error:err});
+        else
+            //res.send({movies: movies.cast[movies.cast.length-1]});
+            //res.json({movies: movies.cast[movies.cast.length-1]})
+            res.json({movies: movies})
+      })
 });
 app.use('/.netlify/functions/api', router);
 
