@@ -16,7 +16,7 @@ var corsOptions = {
 
 app.use(cors())
 app.all('', function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://infallible-shirley-baf3d7.netlify.app");
+  //res.header("Access-Control-Allow-Origin", "https://infallible-shirley-baf3d7.netlify.app");
   res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   //Auth Each API Request created by user.
