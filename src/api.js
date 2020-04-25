@@ -5,9 +5,16 @@ const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
 const serverless = require('serverless-http');
+var cors = require('cors')
 
 const API_PORT = 8000;
 const app = express();
+var corsOptions = {
+  origin: 'https://infallible-shirley-baf3d7.netlify.app',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
+app.use(cors(corsOptions))
 
 const router = express.Router();
 /*
