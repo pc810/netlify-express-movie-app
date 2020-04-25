@@ -35,6 +35,7 @@ const connectDB = async () =>{
 }
 connectDB();
 //let db = mongoose.connection;
+app.options('*', cors(corsOptions))
 
 //db.once('open', () => console.log('connected to the database'));
 
