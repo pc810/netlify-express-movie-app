@@ -14,7 +14,7 @@ var corsOptions = {
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 
-app.use(cors(corsOptions))
+app.use(cors())
 app.all('', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "https://infallible-shirley-baf3d7.netlify.app");
   res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
@@ -41,7 +41,7 @@ const connectDB = async () =>{
 }
 connectDB();
 //let db = mongoose.connection;
-app.options('*', cors(corsOptions))
+app.options('*', cors())
 
 //db.once('open', () => console.log('connected to the database'));
 
@@ -56,7 +56,7 @@ app.use(bodyParser.json());
 // this is our get method
 // this method fetches all available data in our database
 
-router.get('/getMovieIdList', cors(corsOptions),(req, res) => {  
+router.get('/getMovieIdList', cors(),(req, res) => {  
   Movie.find({},{_id:1,poster:1,name:1,rated:1},{limit:50}, (err,movies)=>{
     if(err)
         res.send({error:err});
@@ -66,7 +66,7 @@ router.get('/getMovieIdList', cors(corsOptions),(req, res) => {
         res.json({movies: movies})
   })
 });
-router.get('/getMovieIdListMod',cors(corsOptions), (req, res) => {    
+router.get('/getMovieIdListMod',cors(), (req, res) => {    
   let page = 1, limit= 10,offset = 10;
   let genre = 'all';
   try{
@@ -98,7 +98,7 @@ router.get('/getMovieIdListMod',cors(corsOptions), (req, res) => {
     res.send({error: err})
   }
 });
-router.get('/getMovieDetails', cors(corsOptions),(req, res) => {  
+router.get('/getMovieDetails', cors(),(req, res) => {  
   let id = req.query.id  
   console.log(id);
   Movie.findOne({_id:id}, (err,movie)=>{
@@ -110,7 +110,7 @@ router.get('/getMovieDetails', cors(corsOptions),(req, res) => {
         res.json({movie: movie})
   })
 });
-router.post('/getMovieDetailsWithIds',cors(corsOptions), (req, res) => {  
+router.post('/getMovieDetailsWithIds',cors(), (req, res) => {  
   let ids = req.body.ids;
   let oids = [];
   console.log(ids);
@@ -125,7 +125,7 @@ router.post('/getMovieDetailsWithIds',cors(corsOptions), (req, res) => {
         res.json({movies: movies})
   })
 });
-router.get('/getMovieByName',cors(corsOptions), (req, res) => {    
+router.get('/getMovieByName',cors(), (req, res) => {    
   Movie.find({name: { "$regex" : req.query.name, $options: 'i' } },{_id: 1,name:1,poster:1},{limit: 10}, (err,movies)=>{
     if(err)
         res.send({error:err});
@@ -149,7 +149,7 @@ function verifyToken(req, res, next) {
   req.userId = payload.subject
   next()
 }
-router.post('/login',cors(corsOptions), function (req, res) {
+router.post('/login',cors(), function (req, res) {
   let userData = req.body;
 
   User.findOne({ email: userData.email }, function (err, user) {
@@ -173,7 +173,7 @@ router.post('/login',cors(corsOptions), function (req, res) {
     }
   })
 });
-router.post('/register',cors(corsOptions), function (req, res) {
+router.post('/register',cors(), function (req, res) {
   let userData = req.body
   let user = new User(userData)
   user.save(function (err, registeredUser) {
@@ -187,7 +187,7 @@ router.post('/register',cors(corsOptions), function (req, res) {
     }
   })
 });
-router.post('/addWatchLater',cors(corsOptions), function (req, res) {
+router.post('/addWatchLater',cors(), function (req, res) {
 
   let email = req.body.email;
   let mid = req.body.movieid;
@@ -202,7 +202,7 @@ router.post('/addWatchLater',cors(corsOptions), function (req, res) {
     }
   })  
 });
-router.post('/removeWatchLater', cors(corsOptions),function (req, res) {
+router.post('/removeWatchLater', cors(),function (req, res) {
 
   let email = req.body.email;
   let mid = req.body.movieid;
@@ -217,7 +217,7 @@ router.post('/removeWatchLater', cors(corsOptions),function (req, res) {
     }
   })  
 });
-router.post('/PostReview',cors(corsOptions), (req, res) => {
+router.post('/PostReview',cors(), (req, res) => {
   let id = req.body.mid;
   console.log(req.body);
   Movie.findOne({ _id: id }, (err, movie) => {
@@ -240,7 +240,7 @@ router.post('/PostReview',cors(corsOptions), (req, res) => {
   }
   })
 });
-router.get('/test',cors(corsOptions),(req,res)=>{    
+router.get('/test',cors(),(req,res)=>{    
     Movie.findOne({},{_id:1,poster:1,name:1,rated:1}, (err,movies)=>{
         if(err)
             res.send({error:err});
