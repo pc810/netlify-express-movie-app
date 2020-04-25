@@ -48,7 +48,8 @@ app.use(bodyParser.json());
 
 // this is our get method
 // this method fetches all available data in our database
-router.get('/getMovieIdList', (req, res) => {  
+
+router.get('/getMovieIdList', cors(corsOptions),(req, res) => {  
   Movie.find({},{_id:1,poster:1,name:1,rated:1},{limit:50}, (err,movies)=>{
     if(err)
         res.send({error:err});
@@ -58,7 +59,7 @@ router.get('/getMovieIdList', (req, res) => {
         res.json({movies: movies})
   })
 });
-router.get('/getMovieIdListMod', (req, res) => {    
+router.get('/getMovieIdListMod',cors(corsOptions), (req, res) => {    
   let page = 1, limit= 10,offset = 10;
   let genre = 'all';
   try{
@@ -90,7 +91,7 @@ router.get('/getMovieIdListMod', (req, res) => {
     res.send({error: err})
   }
 });
-router.get('/getMovieDetails', (req, res) => {  
+router.get('/getMovieDetails', cors(corsOptions),(req, res) => {  
   let id = req.query.id  
   console.log(id);
   Movie.findOne({_id:id}, (err,movie)=>{
@@ -102,7 +103,7 @@ router.get('/getMovieDetails', (req, res) => {
         res.json({movie: movie})
   })
 });
-router.post('/getMovieDetailsWithIds', (req, res) => {  
+router.post('/getMovieDetailsWithIds',cors(corsOptions), (req, res) => {  
   let ids = req.body.ids;
   let oids = [];
   console.log(ids);
@@ -117,7 +118,7 @@ router.post('/getMovieDetailsWithIds', (req, res) => {
         res.json({movies: movies})
   })
 });
-router.get('/getMovieByName', (req, res) => {    
+router.get('/getMovieByName',cors(corsOptions), (req, res) => {    
   Movie.find({name: { "$regex" : req.query.name, $options: 'i' } },{_id: 1,name:1,poster:1},{limit: 10}, (err,movies)=>{
     if(err)
         res.send({error:err});
@@ -141,7 +142,7 @@ function verifyToken(req, res, next) {
   req.userId = payload.subject
   next()
 }
-router.post('/login', function (req, res) {
+router.post('/login',cors(corsOptions), function (req, res) {
   let userData = req.body;
 
   User.findOne({ email: userData.email }, function (err, user) {
@@ -165,7 +166,7 @@ router.post('/login', function (req, res) {
     }
   })
 });
-router.post('/register', function (req, res) {
+router.post('/register',cors(corsOptions), function (req, res) {
   let userData = req.body
   let user = new User(userData)
   user.save(function (err, registeredUser) {
@@ -179,7 +180,7 @@ router.post('/register', function (req, res) {
     }
   })
 });
-router.post('/addWatchLater', function (req, res) {
+router.post('/addWatchLater',cors(corsOptions), function (req, res) {
 
   let email = req.body.email;
   let mid = req.body.movieid;
@@ -194,7 +195,7 @@ router.post('/addWatchLater', function (req, res) {
     }
   })  
 });
-router.post('/removeWatchLater', function (req, res) {
+router.post('/removeWatchLater', cors(corsOptions),function (req, res) {
 
   let email = req.body.email;
   let mid = req.body.movieid;
@@ -209,7 +210,7 @@ router.post('/removeWatchLater', function (req, res) {
     }
   })  
 });
-router.post('/PostReview', (req, res) => {
+router.post('/PostReview',cors(corsOptions), (req, res) => {
   let id = req.body.mid;
   console.log(req.body);
   Movie.findOne({ _id: id }, (err, movie) => {
@@ -232,7 +233,7 @@ router.post('/PostReview', (req, res) => {
   }
   })
 });
-router.get('/test',(req,res)=>{    
+router.get('/test',cors(corsOptions),(req,res)=>{    
     Movie.findOne({},{_id:1,poster:1,name:1,rated:1}, (err,movies)=>{
         if(err)
             res.send({error:err});
