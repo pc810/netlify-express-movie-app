@@ -10,38 +10,40 @@ var cors = require('cors')
 const API_PORT = 8000;
 const app = express();
 var corsOptions = {
-  origin: 'https://infallible-shirley-baf3d7.netlify.app',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  // origin: 'https://infallible-shirley-baf3d7.netlify.app',
+  // optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  origin:true,
+  credentials:true
 }
 
-app.use(cors())
-app.all('', function(req, res, next) {
+app.use(cors(corsOptions))
+app.options('*', cors())
+// app.all('', function(req, res, next) {
   //res.header("Access-Control-Allow-Origin", "https://infallible-shirley-baf3d7.netlify.app");
-  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  // res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+  // res.header('Access-Control-Allow-Headers', "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   //Auth Each API Request created by user.
-  next();
-});
+  // next();
+// });
 const router = express.Router();
 /*
 // this is our MongoDB database
 const dbRoute =
-  'mongodb+srv://smp1613:smp1613@moviereviewsentiment-8qo0k.gcp.mongodb.net/test';
+'mongodb+srv://smp1613:smp1613@moviereviewsentiment-8qo0k.gcp.mongodb.net/test';
 // connects our back end code with the database
 mongoose.connect(dbRoute, { useNewUrlParser: true });
 */
 const uri = 
-    "mongodb+srv://smp1613:smp1613@moviereviewsentiment-8qo0k.gcp.mongodb.net/moviedb";
+"mongodb+srv://smp1613:smp1613@moviereviewsentiment-8qo0k.gcp.mongodb.net/moviedb";
 const connectDB = async () =>{
-    await mongoose.connect(uri,{
-        useUnifiedTopology: true,
-        useNewUrlParser: true
-    })
-    console.log("connected")
+  await mongoose.connect(uri,{
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+  })
+  console.log("connected")
 }
 connectDB();
 //let db = mongoose.connection;
-app.options('*', cors())
 
 //db.once('open', () => console.log('connected to the database'));
 
@@ -56,17 +58,20 @@ app.use(bodyParser.json());
 // this is our get method
 // this method fetches all available data in our database
 
-router.get('/getMovieIdList', cors(),(req, res) => {  
+router.get('/', (req,res)=>{
+  res.send({hello:'world'})
+})
+router.get('/getMovieIdList',(req, res) => {  
   Movie.find({},{_id:1,poster:1,name:1,rated:1},{limit:50}, (err,movies)=>{
     if(err)
-        res.send({error:err});
+    res.send({error:err});
     else
         //res.send({movies: movies.cast[movies.cast.length-1]});
         //res.json({movies: movies.cast[movies.cast.length-1]})
         res.json({movies: movies})
   })
 });
-router.get('/getMovieIdListMod',cors(), (req, res) => {    
+router.get('/getMovieIdListMod', (req, res) => {    
   let page = 1, limit= 10,offset = 10;
   let genre = 'all';
   try{
@@ -98,7 +103,7 @@ router.get('/getMovieIdListMod',cors(), (req, res) => {
     res.send({error: err})
   }
 });
-router.get('/getMovieDetails', cors(),(req, res) => {  
+router.get('/getMovieDetails',(req, res) => {  
   let id = req.query.id  
   console.log(id);
   Movie.findOne({_id:id}, (err,movie)=>{
@@ -110,7 +115,7 @@ router.get('/getMovieDetails', cors(),(req, res) => {
         res.json({movie: movie})
   })
 });
-router.post('/getMovieDetailsWithIds',cors(), (req, res) => {  
+router.post('/getMovieDetailsWithIds', (req, res) => {  
   let ids = req.body.ids;
   let oids = [];
   console.log(ids);
@@ -125,7 +130,7 @@ router.post('/getMovieDetailsWithIds',cors(), (req, res) => {
         res.json({movies: movies})
   })
 });
-router.get('/getMovieByName',cors(), (req, res) => {    
+router.get('/getMovieByName', (req, res) => {    
   Movie.find({name: { "$regex" : req.query.name, $options: 'i' } },{_id: 1,name:1,poster:1},{limit: 10}, (err,movies)=>{
     if(err)
         res.send({error:err});
@@ -149,7 +154,7 @@ function verifyToken(req, res, next) {
   req.userId = payload.subject
   next()
 }
-router.post('/login',cors(), function (req, res) {
+router.post('/login', function (req, res) {
   let userData = req.body;
 
   User.findOne({ email: userData.email }, function (err, user) {
@@ -173,7 +178,7 @@ router.post('/login',cors(), function (req, res) {
     }
   })
 });
-router.post('/register',cors(), function (req, res) {
+router.post('/register', function (req, res) {
   let userData = req.body
   let user = new User(userData)
   user.save(function (err, registeredUser) {
@@ -187,7 +192,7 @@ router.post('/register',cors(), function (req, res) {
     }
   })
 });
-router.post('/addWatchLater',cors(), function (req, res) {
+router.post('/addWatchLater', function (req, res) {
 
   let email = req.body.email;
   let mid = req.body.movieid;
@@ -202,7 +207,7 @@ router.post('/addWatchLater',cors(), function (req, res) {
     }
   })  
 });
-router.post('/removeWatchLater', cors(),function (req, res) {
+router.post('/removeWatchLater', function (req, res) {
 
   let email = req.body.email;
   let mid = req.body.movieid;
@@ -217,7 +222,7 @@ router.post('/removeWatchLater', cors(),function (req, res) {
     }
   })  
 });
-router.post('/PostReview',cors(), (req, res) => {
+router.post('/PostReview', (req, res) => {
   let id = req.body.mid;
   console.log(req.body);
   Movie.findOne({ _id: id }, (err, movie) => {
@@ -240,7 +245,7 @@ router.post('/PostReview',cors(), (req, res) => {
   }
   })
 });
-router.get('/test',cors(),(req,res)=>{    
+router.get('/test',(req,res)=>{    
     Movie.findOne({},{_id:1,poster:1,name:1,rated:1}, (err,movies)=>{
         if(err)
             res.send({error:err});
